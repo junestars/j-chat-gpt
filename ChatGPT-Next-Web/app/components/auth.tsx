@@ -93,6 +93,7 @@ export function AuthPage() {
         clearInterval(timer);
       }
     }, 1000);
+    return timer;
   };
 
   const handleSendCode = () => {
@@ -100,9 +101,12 @@ export function AuthPage() {
       return console.log("请输入正确的手机号");
     }
 
-    handleTimer();
+    const timer = handleTimer();
 
     sendCode(phone).catch((error) => {
+      setBtnText("发送验证码");
+      setDisableBtn(false);
+      clearInterval(timer);
       console.log(error);
     });
   };
