@@ -9,6 +9,11 @@ import codes from './codes.mjs';
 
 const router = express.Router();
 
+/**
+ * 验证码过期时间
+ */
+const SMS_CODE_EXPIRES = env.SMS_CODE_EXPIRES || 5 * 60 * 100;
+
 router
     .all('*', (req, res, next) => {
         res.header('Access-Control-Allow-Origin', '*');
@@ -27,22 +32,21 @@ router
     .post('/send-code', (req, res) => {
         const { phone } = req.body;
         if (phone?.length !== 11) {
-            res.status(400).send({ message: '错误的手机号' });
+            res.status(400).send({ message: '错误的手机号', error: true, statusCode: '000001' });
         } else {
             sendCode(phone)
                 .then(({ code, ...data }) => {
                     // 以手机号为 key 存储发送的验证码
                     codes[phone] = code;
 
-                    // 验证码有效期为 5 分钟
                     setTimeout(() => {
                         delete codes[phone];
-                    }, 5 * 60 * 1000);
+                    }, SMS_CODE_EXPIRES);
 
                     res.status(200).send(data);
                 })
                 .catch(err => {
-                    res.status(500).send(err);
+                    res.status(400).send({ ...err, error: true, statusCode: '000003' });
                 });
         }
     })

@@ -1,8 +1,9 @@
 // 需要在最上层导入环境变量设置
-import './processEnv.mjs'
+import './processEnv.mjs';
 
 import express from 'express';
 import router from './router.mjs';
+import { env } from 'node:process';
 
 const app = express();
 
@@ -15,6 +16,6 @@ app.use((error, request, response, next) => {
     }
 });
 
-app.listen(4545, () => {
-    console.log('服务已启动, 请访问: 127.0.0.1:4545');
+app.listen(env.SERVER_PORT, () => {
+    console.log(`服务已启动，请访问：http://localhost:${env.SERVER_PORT}`);
 });

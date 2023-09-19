@@ -1,36 +1,16 @@
 import moment from 'moment';
-import CryptoJS from 'crypto-js';
 import request from './request.mjs';
+import { env } from 'node:process';
 
-const BASE_URL = 'https://app.cloopen.com:8883';
-const ACCOUNT_SID = '2c94811c8a27cf2d018a8369bbb61ab1';
-const AUTH_TOKEN = '5c93a3e987134ff98a3ae7ca1cedbd70';
-const APP_ID = '2c94811c8a27cf2d018a8369bce91ab8';
-const TEMPLATE_ID = '1';
+/**
+ * 上一次发送验证码的时间
+ */
+let LAST_REQUEST_TIME = 0;
 
-let timeStamp;
-
-const getTimeStamp = () => moment().format('YYYYMMDDhhmmss');
-
-const getSigParameter = () => {
-    timeStamp = getTimeStamp();
-
-    const message = `${ACCOUNT_SID}${AUTH_TOKEN}${timeStamp}`;
-
-    return CryptoJS.MD5(message).toString().toUpperCase();
-};
-
-const getAuthorization = () => {
-    const str = `${ACCOUNT_SID}:${timeStamp}`;
-    const wordArray = CryptoJS.enc.Utf8.parse(str);
-
-    return CryptoJS.enc.Base64.stringify(wordArray);
-};
-
-const getUrl = () => {
-    const SigParameter = getSigParameter();
-    return `${BASE_URL}/2013-12-26/Accounts/${ACCOUNT_SID}/SMS/TemplateSMS?sig=${SigParameter}`;
-};
+/**
+ * 验证码发送的间隔时间
+ */
+const INTERVAL_TIME = Number(env.SMS_CODE_INTERVAL) || 0;
 
 /*
  生成指定长度的随机数
@@ -44,26 +24,29 @@ function randomCode(length) {
     return result;
 }
 
-const sendCode = async (phoneNumber, code) => {
+const sendCode = async (phone, code) => {
+    const currentTime = Date.now();
+
+    if (LAST_REQUEST_TIME !== 0 && currentTime - LAST_REQUEST_TIME < INTERVAL_TIME) {
+        return Promise.reject({ message: '您的操作过于频繁，请稍后重试', error: true, statusCode: '000003' });
+    }
+
+    LAST_REQUEST_TIME = currentTime;
+
     code = code || randomCode(4);
-    const url = getUrl();
-    const authorization = getAuthorization();
+    const sendtime = moment().format('yyyyMMDDHHmm');
 
     return request({
-        url,
+        url: process.env.SMS_CODE_SERVER_URL,
         method: 'POST',
-        headers: {
-            // Accept: 'application/json',
-            // 'Content-Type': 'application/json;charset=utf-8;',
-            Authorization: authorization
-        },
         data: {
-            to: phoneNumber,
-            appId: APP_ID,
-            templateId: TEMPLATE_ID,
-            datas: [code, '1']
+            phone,
+            sendtime,
+            account: process.env.SMS_CODE_ACCOUNT,
+            password: process.env.SMS_CODE_PASSWORD,
+            msg: `【${process.env.SMS_CODE_SIGN}】 ${code} 是您的验证码（5分钟内有效），您正在登陆，切勿泄露，非本人操作请忽略。`
         }
-    }).then(res => ({ ...res, code }));
+    }).then(res => ({ ...res, code, error: false, statusCode: '000000' }));
 };
 
 export default sendCode;

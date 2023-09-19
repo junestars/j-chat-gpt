@@ -20,8 +20,8 @@ const service = axios.create({
 });
 
 service.interceptors.response.use(response => {
-    const statusCode = response.data?.statusCode;
-    if (statusCode === '000000') {
+    const statusCode = response.data?.code;
+    if (statusCode === '0') {
         return Promise.resolve(response.data);
     }
     return Promise.reject(response.data);
