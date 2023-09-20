@@ -40,6 +40,11 @@ env.SMS_CODE_EXPIRES = 1000 * 60 * 5;
 env.SMS_CODE_INTERVAL = 1000 * 60 * 1;
 
 /**
+ * token 有效时间，单位 s，如果没有配置，则是 8 小时
+ */
+env.TOKEN_EXPIRES = 60 * 60 * 8;
+
+/**
  * open key api
  */
 env.OPENAI_API_KEY = '';

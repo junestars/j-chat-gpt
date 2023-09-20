@@ -14,6 +14,11 @@ const router = express.Router();
  */
 const SMS_CODE_EXPIRES = env.SMS_CODE_EXPIRES || 5 * 60 * 100;
 
+/**
+ * token 过期时间
+ */
+const TOKEN_EXPIRES = env.TOKEN_EXPIRES || 60 * 60 * 8;
+
 router
     .all('*', (req, res, next) => {
         res.header('Access-Control-Allow-Origin', '*');
@@ -56,7 +61,7 @@ router
             delete codes[phone];
 
             const token = jwt.sign({ phone, code }, SECRET, {
-                expiresIn: 60 * 60 * 8,
+                expiresIn: TOKEN_EXPIRES,
                 algorithm: ALGORITHM
             });
 
