@@ -59,7 +59,6 @@ export function AuthPage() {
       verifyCode({ phone, code })
         .then((res) => {
           window.localStorage.setItem("user", "Bearer " + res.token);
-          access.updateAuth("Bearer " + res.token);
           access.updatePhone(phone);
           navigate(Path.Home);
         })

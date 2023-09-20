@@ -6,7 +6,6 @@ import { BOT_HELLO } from "./chat";
 import { getClientConfig } from "../config/client";
 
 export interface AccessControlStore {
-  accessAuth: string; // 我们的验证 token
   accessPhone: string;
   accessCode: string;
   token: string;
@@ -19,7 +18,6 @@ export interface AccessControlStore {
   openaiUrl: string;
 
   updateToken: (_: string) => void;
-  updateAuth: (_: string) => void;
   updatePhone: (_: string) => void;
   updateCode: (_: string) => void;
   updateOpenAiUrl: (_: string) => void;
@@ -37,7 +35,6 @@ console.log("[API] default openai url", DEFAULT_OPENAI_URL);
 export const useAccessStore = create<AccessControlStore>()(
   persist(
     (set, get) => ({
-      accessAuth: "",
       accessPhone: "",
       token: "",
       accessCode: "",
@@ -55,9 +52,6 @@ export const useAccessStore = create<AccessControlStore>()(
       },
       updateCode(code: string) {
         set(() => ({ accessCode: code?.trim() }));
-      },
-      updateAuth(auth: string) {
-        set(() => ({ accessAuth: auth?.trim() }));
       },
       updatePhone(phone: string) {
         set(() => ({ accessPhone: phone?.trim() }));

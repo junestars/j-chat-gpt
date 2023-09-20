@@ -130,7 +130,7 @@ export function getHeaders() {
   let headers: Record<string, string> = {
     "Content-Type": "application/json",
     "x-requested-with": "XMLHttpRequest",
-    "x-auth-token": accessStore.accessAuth, // 添加用于登录验证的请求头
+    "x-auth-token": window.localStorage.getItem('user') || '', // 添加用于登录验证的请求头
   };
 
   const makeBearer = (token: string) => `Bearer ${token.trim()}`;

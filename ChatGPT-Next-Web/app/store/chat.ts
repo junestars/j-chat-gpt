@@ -277,7 +277,7 @@ export const useChatStore = create<ChatStore>()(
           session.lastUpdate = Date.now();
         });
         get().updateStat(message);
-        get().summarizeSession(); 
+        get().summarizeSession();
       },
 
       async onUserInput(content) {
@@ -332,8 +332,8 @@ export const useChatStore = create<ChatStore>()(
             botMessage.streaming = false;
             if (message) {
               botMessage.content = message;
-              console.log({botMessage});
-              
+              console.log({ botMessage });
+
               get().onNewMessage(botMessage);
             }
             ChatControllerPool.remove(session.id, botMessage.id);

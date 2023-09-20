@@ -127,8 +127,6 @@ function Screen() {
   const isAuth = !token || location.pathname === Path.Auth;
   const isMobileScreen = useMobileScreen();
 
-  useAccessStore.getState().updateAuth(token);
-
   useEffect(() => {
     loadAsyncGoogleFont();
   }, []);
