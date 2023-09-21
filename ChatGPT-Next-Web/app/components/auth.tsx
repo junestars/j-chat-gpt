@@ -7,6 +7,7 @@ import { useAccessStore } from "../store";
 import BotIcon from "../icons/bot.svg";
 import { useEffect, useState } from "react";
 import { getClientConfig } from "../config/client";
+import { showToast } from "./ui-lib";
 
 const NODE_SERVER_BASE_URL = process.env.NEXT_PUBLIC_NODE_SERVER_BASE_URL;
 
@@ -55,19 +56,22 @@ export function AuthPage() {
   const [phone, setPhone] = useState(""); // 手机号
 
   const goHome = () => {
-    if (phone?.length === 11 && code?.length === 4) {
-      verifyCode({ phone, code })
-        .then((res) => {
-          window.localStorage.setItem("user", "Bearer " + res.token);
-          access.updatePhone(phone);
-          navigate(Path.Home);
-        })
-        .catch((error) => {
-          console.log("验证失败", error);
-        });
-    } else {
-      console.log("请输入验证码或手机号");
+    if (phone?.length !== 11) {
+      return showToast("请输入正确的手机号");
     }
+    if (code?.length !== 4) {
+      return showToast("请输入四位验证码");
+    }
+
+    verifyCode({ phone, code })
+      .then((res) => {
+        window.localStorage.setItem("user", "Bearer " + res.token);
+        access.updatePhone(phone);
+        navigate(Path.Home);
+      })
+      .catch((error) => {
+        showToast(error.message);
+      });
   };
 
   useEffect(() => {
@@ -97,7 +101,7 @@ export function AuthPage() {
 
   const handleSendCode = () => {
     if (phone?.length !== 11) {
-      return console.log("请输入正确的手机号");
+      return showToast("请输入正确的手机号");
     }
 
     const timer = handleTimer();
@@ -106,7 +110,7 @@ export function AuthPage() {
       setBtnText("发送验证码");
       setDisableBtn(false);
       clearInterval(timer);
-      console.log(error);
+      showToast(error.message);
     });
   };
 
