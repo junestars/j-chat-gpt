@@ -61,7 +61,7 @@ router
             delete codes[phone];
 
             const token = jwt.sign({ phone, code }, SECRET, {
-                expiresIn: TOKEN_EXPIRES,
+                expiresIn: Number(TOKEN_EXPIRES),
                 algorithm: ALGORITHM
             });
 
